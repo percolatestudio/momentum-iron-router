@@ -1,9 +1,13 @@
+// if a transition takes longer than this, we bail and print an error
+var MAX_TRANSITION_TIME = 20000;
+
 var Transitioner = {
   // the number of elements that are currently mid-transition
   transitioning: 0,
   
   // should we be queuing transitions right now?
   queueing: false,
+  queueBailout: null,
   queuedTransitions: [],
   
   renders: [],
@@ -51,6 +55,12 @@ var Transitioner = {
     if (self.transitioning === 1) {
       Deps.afterFlush(function() {
         self.queueing = (self.transitioning > 0);
+        self.queueBailout = Meteor.setTimeout(function() {
+          console.error("A transition ran for more than ", MAX_TRANSITION_TIME, "ms.",
+            "To avoid problems, queued transitions have run.");
+          self.transitioning = 0;
+          self.runQueue();
+        }, MAX_TRANSITION_TIME)
       });
     }
   },
@@ -62,6 +72,8 @@ var Transitioner = {
   runQueue: function() {
     var self = this;
     self.queueing = false;
+    Meteor.clearTimeout(self.queueBailout);
+    self.queueBailout = null;
     _.each(self.queuedTransitions, function(transition) {
       self.runTransition(transition);
     });
