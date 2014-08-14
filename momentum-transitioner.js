@@ -4,6 +4,7 @@ var Transitioner = {
   
   // should we be queuing transitions right now?
   queueing: false,
+  queuedTransitions: [],
   
   renders: [],
   start: function() {
@@ -24,43 +25,53 @@ var Transitioner = {
     });
   },
   
+  // either 
+  //  a) run the fn, and queue any further transitions until it's done
+  //  b) queue the fn
+  runTransition: function(fn) {
+    var self = this;
+    
+    if (self.queueing)
+      return self.queue(fn);
+    
+    // if we finish the last active transition, we can run the queue
+    var done = function() {
+      self.transitioning -= 1;
+      if (self.transitioning === 0)
+        self.runQueue();
+    }
+    
+    self.transitioning += 1;
+    fn(done);
+    
+    // when we run the first transition, wait until the end of the flush cycle
+    //    (so for example if this is the removeElement, the corresponding 
+    //      insertElement runs too)
+    //  after which, we queue all incoming transitions
+    if (self.transitioning === 1) {
+      Deps.afterFlush(function() {
+        self.queueing = (self.transitioning > 0);
+      });
+    }
+  },
+  
+  queue: function(transition) {
+    this.queuedTransitions.push(transition);
+  },
+  
+  runQueue: function() {
+    var self = this;
+    self.queueing = false;
+    _.each(self.queuedTransitions, function(transition) {
+      self.runTransition(transition);
+    });
+    self.queuedTransitions = [];
+  }
 }
 Transitioner.start();
 
-// Deps.autorun(function() {
-//   // if transition hasn't yet been unset, we need to queue this one
-//   delayTransition = (transitioning > 0);
-//
-//   if (nextDefaultType !== null) {
-//     defaultTransitionType = nextDefaultType;
-//     nextDefaultType = null;
-//   } else {
-//     defaultTransitionType = 'normal';
-//   }
-// });
-
-// var transitionCbs = [];
-// var onTransitionComplete = function() {
-//   transitioning -= 1;
-//
-//   if (transitioning === 0) {
-//     _.each(transitionCbs, function(cb) { cb(); });
-//     transitionCbs = [];
-//   }
-// }
-//
-//
-// var maybeDelay = function(fn) {
-//   if (delayTransition) {
-//     transitionCbs.push(fn);
-//   } else {
-//     fn();
-//   }
-// }
-
 Momentum.registerPlugin('route-transitioner', function(options) {
   check(options.options, Match.Optional(Function));
-  console.log(options)
   
   var getPluginOptions = function(node) {
     var type = options.options &&
@@ -86,15 +97,23 @@ Momentum.registerPlugin('route-transitioner', function(options) {
     return plugin(_.omit(pluginOptions, 'with'));
   }
   
+  // XXX: strictly speaking, these functions should *also* take a done
+  //   and merge that with the done that the transitioner's waiting for.
   return {
     insertElement: function(node, next) {
-      getPlugin(node).insertElement(node, next);
+      Transitioner.runTransition(function(done) {
+        getPlugin(node).insertElement(node, next, done);
+      });
     },
     moveElement: function(node, next) {
-      getPlugin(node).moveElement(node, next);
+      Transitioner.runTransition(function(done) {
+        getPlugin(node).moveElement(node, next, done);
+      });
     },
     removeElement: function(node) {
-      getPlugin(node).removeElement(node);
+      Transitioner.runTransition(function(done) {
+        getPlugin(node).removeElement(node, done);
+      });
     },
     // force: true
   }
