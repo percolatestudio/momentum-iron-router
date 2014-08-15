@@ -82,7 +82,7 @@ var Transitioner = {
 }
 Transitioner.start();
 
-Momentum.registerPlugin('route-transitioner', function(options) {
+Momentum.registerPlugin('iron-router', function(options) {
   check(options.options, Match.Optional(Function));
   
   var getPluginOptions = function(node) {
