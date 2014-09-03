@@ -9,7 +9,7 @@ Package.on_use(function (api, where) {
   api.versionsFrom('METEOR@0.9.0.1');
   
   api.use(['deps', 
-    'iron:router@0.9.1', 
+    'iron-router', 
     'percolate:momentum@0.0.1'], 
   'client');
   
