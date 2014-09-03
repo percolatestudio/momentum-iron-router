@@ -10,7 +10,7 @@ Package.on_use(function (api, where) {
   
   api.use(['deps', 
     'iron:router@0.9.3-rc0', 
-    'percolate:momentum@0.0.3-rc0'], 
+    'percolate:momentum@0.0.3-rc1'], 
   'client');
   
   api.add_files('momentum-transitioner.js', ['client']);
