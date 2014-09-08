@@ -50,14 +50,14 @@ Momentum.registerPlugin('iron-router', function(options) {
   }
   
   return {
-    insertElement: function(node, next) {
-      getPlugin(node).insertElement(node, next);
+    insertElement: function(node, next, done) {
+      getPlugin(node).insertElement(node, next, done);
     },
-    moveElement: function(node, next) {
-      getPlugin(node).moveElement(node, next);
+    moveElement: function(node, next, done) {
+      getPlugin(node).moveElement(node, next, done);
     },
-    removeElement: function(node) {
-      getPlugin(node).removeElement(node);
+    removeElement: function(node, done) {
+      getPlugin(node).removeElement(node, done);
     },
     // force: true
   }
