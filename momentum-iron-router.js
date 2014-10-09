@@ -23,7 +23,6 @@ Transitioner.start();
 
 Momentum.registerPlugin('iron-router', function(options) {
   check(options.options, Match.Optional(Function));
-  console.log(options)
   
   var getPluginOptions = function(node) {
     var type = options.options &&
