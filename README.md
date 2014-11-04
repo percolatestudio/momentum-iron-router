@@ -6,13 +6,13 @@ Meteor [Momentum](https://github.com/percolatestudio/meteor-momentum) plugin for
 ## Usage:
 
 ```
-{{#momentum with='iron-router' options=transitionOptions}}
+{{#momentum plugin='iron-router' options=transition}}
   {{> yield}}
 {{/momentum}}
 ```
 
 ```
-Template.X.transitionOptions = function(from, to, element) {
+Template.X.transition = function() { return function(from, to, element) {
   return 'name-of-momentum-plugin';
   
   // or
@@ -21,4 +21,4 @@ Template.X.transitionOptions = function(from, to, element) {
     with: 'name-of-plugin',
     extra: 'options-for-plugin'
   }
-}
+} }
