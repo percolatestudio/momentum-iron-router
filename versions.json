@@ -134,7 +134,11 @@
     ],
     [
       "percolate:momentum",
-      "0.5.1"
+      "0.6.1"
+    ],
+    [
+      "percolate:velocityjs",
+      "1.0.0"
     ],
     [
       "random",
