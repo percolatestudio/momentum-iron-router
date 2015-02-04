@@ -2,7 +2,7 @@ Package.describe({
   name: "percolate:momentum-iron-router",
   summary: "A momentum plugin for transitioning Iron Router pages",
   version: "0.7.0",
-  git: "https://github.com/percolatestudio/momentum-iron-router.git"
+  github: "https://github.com/percolatestudio/momentum-iron-router.git"
 });
 
 Package.on_use(function (api, where) {
