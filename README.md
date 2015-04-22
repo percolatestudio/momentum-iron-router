@@ -22,3 +22,8 @@ Template.X.transition = function() { return function(from, to, element) {
     extra: 'options-for-plugin'
   }
 } }
+```
+
+## License 
+
+MIT. (c) Percolate Studio, maintained by Tom Coleman (@tmeasday).
